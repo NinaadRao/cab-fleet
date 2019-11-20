@@ -1,0 +1,183 @@
+<html>
+<head>
+    <link rel="icon" type="image/png" href="../static/images/icons/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../static/vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/fonts/iconic/css/material-design-iconic-font.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/animsition/css/animsition.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/select2/select2.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/util.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script>
+            var xhr = new XMLHttpRequest();
+            source_lat = 0;
+            source_long = 0;
+            dest_lat = 0;
+            dest_long = 0;
+            function send_map_request()
+            {
+                xhr.onreadystatechange = load_image
+                xhr.open("GET", "http://127.0.0.1:5000/loadStaticMap", true);
+                xhr.send()
+            }
+            // count = 0
+            // var eventSource = new EventSource("http://127.0.0.1:5000/");
+            // eventSource.onmessage = load_image
+            function load_image() {
+                if(xhr.readyState == 4 && xhr.status == 200)
+                {
+                    // console.log("INSIDE HERE ", count)
+                    // count += 1
+                    graphs = JSON.parse(this.responseText)
+                    console.log(graphs)
+                    var layout = {
+                        title: 'Scroll and Zoom',
+                        showlegend: false
+                    };
+    
+                    Plotly.react('graph1', graphs, layout, { scrollZoom: false });
+                }
+                // Plotly.plot('bargraph',graphs,layout, {});
+            }
+            function getCabs()
+            {
+                source = document.getElementById("src");
+                destination = document.getElementById("dest");
+                xhr.onreadystatechange = load_near_cabs
+                xhr.open("POST", "http://127.0.0.1:5000/search", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.send(JSON.stringify({"source":source.value, "destination":destination.value}))
+            }
+
+            function load_near_cabs()
+            {
+                if(xhr.readyState == 4 && xhr.status == 200)
+                {
+                    // console.log("INSIDE HERE ", count)
+                    // count += 1
+                    res = JSON.parse(this.responseText)
+                    var layout = {
+                        title: 'Scroll and Zoom',
+                        showlegend: false
+                    };
+                    console.log(res)
+                    Plotly.react('graph1', JSON.parse(res['graph']), layout, { scrollZoom: false });
+                    confirmB = document.getElementById('confirm');
+                    confirmB.style.display = "block";
+                    source_lat = res['source_lat'];
+                    source_long = res['source_long'];
+                    dest_lat = res['dest_lat'];
+                    dest_long = res['dest_long'];
+                }
+            }
+
+            function confirmCab()
+            {
+                xhr.onreadystatechange = load_simulation;
+                xhr.open("POST", "http://127.0.0.1:5000/confirm");
+                xhr.send(JSON.stringify({"source_lat":source_lat,"source_long":source_long, "dest_lat":dest_lat, "dest_long":dest_long}))
+            }
+            function load_simulation()
+            {
+                if(xhr.readyState == 4 && xhr.status == 200)
+                {
+                    var eventSource = new EventSource("http://127.0.0.1:5000/updateLoc");
+                    eventSource.onmessage = update_location
+                }
+            }
+            
+        function update_location(e) {  
+            console.log(e.data)          
+            graphs = JSON.parse(e.data)
+            console.log(graphs)
+            var layout = {
+                title: 'Scroll and Zoom',
+                showlegend: false
+            };
+
+            Plotly.react('graph1', graphs, layout, { scrollZoom: false });
+
+            // Plotly.plot('bargraph',graphs,layout, {});
+        }
+        function logout()
+        {
+            xhr.onreadystatechange = loggedout
+            xhr.open("GET", "http://127.0.0.1:5000/logout")
+            xhr.send();
+        }
+
+        function loggedout()
+        {
+            // print(xhr.readyState)
+            // print(xhr.status)
+
+            if(xhr.readyState == 4 && xhr.status == 200)
+            {
+                window.location.href = "./templates/index.html"
+            }
+        }
+            // var graphs = {{plots | safe}};
+            // Plotly.plot('bargraph',graphs,{});
+        </script>
+</head>
+
+
+
+<body onload = "send_map_request()">
+        <div>
+
+                <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background:-webkit-linear-gradient(top, #7579ff, #b224ef);">
+                <div class="container">
+                    <div class="collapse navbar-collapse" id="navbarResponsive" style="font-size:20px;">
+                        <center><font color="white">Cab Booking</font></center>
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <button class="nav-link" onclick = "logout()"><font color="white">Logout</font></button>
+                            </li>
+        
+        
+        
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+                <br><br><br>
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<div class="container text-center">
+<div class="row">
+        <form class="form-inline">
+
+    <div class="col-md-3"></div>
+     
+    <div class = "form-group">
+
+        <input class="form-control input-lg" type="text" name="source" placeholder="Enter Source" aria-label="Search" id = "src">
+
+        <input class="form-control input-lg" type="text" name= "destination" placeholder="Enter Destination" aria-label="Search" id = "dest">
+        <input type="button" class="btn btn-success" value="Find Cabs" onclick="getCabs()">
+
+    </div>
+    </form>
+    <input type="button" class="btn btn-success" id = "confirm" value="Confirm" onclick="confirmCab()" style = "display: none;">
+
+    </div></div>
+<div  class="chart" id="graph1" align="center" style="height:110%;width:100%">
+
+</div>
+    <!-- {% for i in plots %}
+     <script>
+    count = 0
+        var graphs = {{i | safe}};
+        Plotly.plot('graph1' ,graphs,{});
+        count++;
+    </script>
+{% endfor %} -->
+    
+</body>
+</html>

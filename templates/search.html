@@ -1,0 +1,66 @@
+<html>
+<head>
+    <link rel="icon" type="image/png" href="../static/images/icons/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="../static/vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/fonts/iconic/css/material-design-iconic-font.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/animate/animate.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/css-hamburgers/hamburgers.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/animsition/css/animsition.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/select2/select2.min.css">
+	<link rel="stylesheet" type="text/css" href="../static/vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/util.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</head>
+<div>
+
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background:-webkit-linear-gradient(top, #7579ff, #b224ef);">
+        <div class="container">
+            <div class="collapse navbar-collapse" id="navbarResponsive" style="font-size:20px;">
+                <center><font color="white">Cab Booking</font></center>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout"><font color="white">Logout</font></a>
+                    </li>
+
+
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+        <br><br><br>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+
+
+<div class="container text-center">
+<div class="row">
+    <div class="col-md-2"></div>
+        <form class="form-inline" method="POST" action="/search">
+    <div class = "form-group">
+
+        <input class="form-control input-lg" type="text" name="source" placeholder="Enter Source" aria-label="Search">
+
+        <input class="form-control input-lg" type="text" name= "destination" placeholder="Enter Destination" aria-label="Search">
+        <input type="submit" class="btn btn-success" value="Find Cabs">
+
+    </div>
+        </form></div></div>
+<div  class="chart" id="graph1" align="center" style="height:110%;width:100%">
+
+    </div>
+    {% for i in plots %}
+     <script>
+    count = 0
+        var graphs = {{i | safe}};
+        Plotly.plot('graph1' ,graphs,{});
+        count++;
+    </script>
+{% endfor %}
+
+</body>
+</html>
