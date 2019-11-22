@@ -1,4 +1,4 @@
-# cab-fleet
+# Cab Fleet Management
 
 ##### To run this code: Make sure that you have all the modules mentioned in the backend.py installed. 
 ##### You can run : 	pip install -r requirements.txt  
